@@ -27,6 +27,7 @@ metadata.v2 <- merge(x=metadata, y=gender.mod.parity, by=c("mid", "visit"), all=
 metadata.v2 <- merge(x=metadata.v2, y=eBF, by="mid", all=F)
 str(metadata.v2)
 
+#re-ordering columns
 metadata.v2 <- metadata.v2[,c(3:55,1:2)]
 
 #Step 3: read in the feature table. 
