@@ -1,0 +1,8 @@
+#these are the commands used with taxaHFE version 2.0 to identify taxa from visit 2 stool sample potentially
+#associated with diarrhea, fever, or vomit in visit 3 or visit 4. 
+
+taxaHFE --subject_identifier sample.id --label infant.diarrhea.in.visit3.or.visit4 --seed 123 taxaHFE.metadata.visit2.csv taxaHFE.feature.table.rarefied.counts.species.visit2.csv taxaHFE.output.diarrhea.visit3visit4.csv
+
+taxaHFE --subject_identifier sample.id --label infant.fever.in.visit3.or.visit4 --seed 123 taxaHFE.metadata.visit2.csv taxaHFE.feature.table.rarefied.counts.species.visit2.csv taxaHFE.output.fever.visit3visit4.csv
+
+taxaHFE --subject_identifier sample.id --label infant.vomit.in.visit3.or.visit4 --seed 123 taxaHFE.metadata.visit2.csv taxaHFE.feature.table.rarefied.counts.species.visit2.csv taxaHFE.output.vomit.visit3visit4.csv
