@@ -2,13 +2,13 @@
 
 ## R code files:
 ### "alpha-diversity.R"
-This file contains R code used to determine if infant stool alpha-diversity differed with infant morbidity from the same visit. Linear mixed effects modeling was employed to determine if diarrhea, fever or vomitting were significant predictors of alpha-diversity. The various parameters and covariates included in models are shown in the code file. 
+This file contains R code used to determine if infant stool alpha-diversity differed with infant morbidity from the same visit. Linear mixed effects modeling was employed to determine if diarrhea, fever or vomiting were significant predictors of alpha-diversity. The various parameters and covariates included in models are shown in the code file. 
 
 ### "batch.effect.R"
 This file contains R code used (1) to assess the variation in infant stool [DNA] and read depth by extraction batch or bead basher type (old vs. new) via one-way ANOVA; (2) to determine read depth varied by DNA extraction batch, bead basher, plate batch, or sequencing batch via student's t-test or wilcoxon rank sum test; (3) to determine if beta-diversity varied by DNA extraction batch, PCR/plate batch, sequencing batch, read depth, or [DNA] using permutational multivariate analysis of variance.
 
 ### "beta-diversity.R"
-This file contains R code used to determine if beta-diversity differed by infant morbidity. Permutational multivariate analysis of variances was employed to determine whether weighted or unweighted UniFrac distances associated with infant diarrhea, fever, or vomitting. We investigated associations within each visit (cross-sectional approach) and across all visits (longitudinal approach). Co-variates were included in the full models. Reduced models were also generated that did excluded co-variates which were not found to be significantly associated with beta-diversity in the full model. For the morbidities and co-variates that were significantly associated with beta-diversity, principal coordinate analysis was performed to visualize clustering of samples by the variable of interest.
+This file contains R code used to determine if beta-diversity differed by infant morbidity. Permutational multivariate analysis of variances was employed to determine whether weighted or unweighted UniFrac distances associated with infant diarrhea, fever, or vomiting. We investigated associations within each visit (cross-sectional approach) and across all visits (longitudinal approach). Co-variates were included in the full models. Reduced models were also generated that did excluded co-variates which were not found to be significantly associated with beta-diversity in the full model. For the morbidities and co-variates that were significantly associated with beta-diversity, principal coordinate analysis was performed to visualize clustering of samples by the variable of interest.
 
 ### "complementary_feeding_Granulicatella.R"
 This script contains the code used to determine infant age at first introduction to complementary food/fluids, and code used to investigate associations between infant age at first complementary feeding and infant stool Granulicatella abundance. 
@@ -26,8 +26,8 @@ This file contains the code used to explore the microbial taxa from visit 2 that
 This script contains the code used to identify microbial genera correlations in the infant stool, across all visits, using NetCoMi. 
 
 ### "predicting_morbidity_outcomes_from_alpha_diversity.R"
-This script contains the code used to determine if infant stool alpha diversity in visit 2 is predictive of infant diarrhea, fever, or vomitting in visits 3 and/or 4. Logistic regression models were generated and the performance of the models were assessed with confusion matrices and ROC AUC.  
+This script contains the code used to determine if infant stool alpha diversity in visit 2 is predictive of infant diarrhea, fever, or vomiting in visits 3 and/or 4. Logistic regression models were generated and the performance of the models were assessed with confusion matrices and ROC AUC.  
 
 ### "taxaHFE.commands.txt"
-These are the commands used with taxaHFE version 2.0 to identify taxa from visit 2 stool samples potentially associated with diarrhea, fever, or vomit in visit 3 and/or visit 4.
+These are the commands used with taxaHFE version 2.0 to identify taxa from visit 2 stool samples potentially associated with diarrhea, fever, or vomiting in visit 3 and/or visit 4.
  
