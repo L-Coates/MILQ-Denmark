@@ -1,0 +1,71 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2761
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\csgray\c0;}
+\margl1440\margr1440\vieww18540\viewh10700\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 #Step 1. Import demultiplexed, paired end sequences\
+qiime tools import --type SampleData[PairedEndSequencesWithQuality] --input-path <path to directory with paired end sequences> --output-path <imported sequences output> --input-format CasavaOneEightSingleLanePerSampleDirFmt\
+\
+#Step 2. Trim forward primers from forward and reverse reads and discard any reads from which no forward primer was recognized. \
+qiime cutadapt trim-paired --i-demultiplexed-sequences <imported sequences> --o-trimmed-sequences <trimmed sequences output> --p-front-f GTGYCAGCMGCCGCGGTAA --p-front-r CCGYCAATTYMTTTRAGTTT --p-error-rate 0.106 --p-discard-untrimmed --output-dir <discarded sequences output>\
+\
+#Step 3. Trim reverse primers from forward and reverse reads from which forward primers have already been trimmed. Don\'92t discard reads in which a reverse primer was not recognized. \
+qiime cutadapt trim-paired --i-demultiplexed-sequences <forward primer-trimmed sequences from step 2> --o-trimmed-sequences <trimmed sequences output> --p-adapter-f AAACTYAAAKRAATTGRCGG --p-adapter-r TTACCGCGGCKGCTGRCAC --p-error-rate 0.106\
+\
+#Step 4. Use DADA2. Involves truncating, deniosing, and dereplicating reads, removing chimeric reads, identifying amplicon sequence variants, and counting reads in each sample for each amplicon sequence variant (i.e. feature table).  \
+qiime dada2 denoise-paired --i-demultiplexed-seqs <primer-trimmed sequences from step 3>  --p-trunc-len-f 222 --p-trunc-len-r 171 --o-table <DADA2 output feature table> --o-representative-sequences <DADA2 output representative sequences> --o-denoising-stats <details of run>\
+\
+#Step 5. Extract simulated amplicon reads from reference sequences from the SILVA database\
+qiime feature-classifier extract-reads --i-sequences <filepath to imported reference sequences from SILVA database> --p-f-primer GTGYCAGCMGCCGCGGTAA --p-r-primer CCGYCAATTYMTTTRAGTTT --p-min-length 200 --p-max-length 500 --o-reads <reference sequences output>\
+\
+#Step 6. Train the naive bayes classifier\
+qiime feature-classifier fit-classifier-naive-bayes --i-reference-reads <reference sequences extracted from full-length SILVA sequences from step 5> --i-reference-taxonomy <reference taxonomy from SILVA> --o-classifier <naive bayes classifier output>\
+\
+#Step 7. Classify reads by taxon using the fitted classifier\
+qiime feature-classifier classify-sklearn --i-classifier <taxonomic classifier from step 6> --i-reads <representative sequences from DADA2 output from step 4> --o-classification <output taxonomic classification of representative sequences> \
+\
+#Step 8. Remove singletons from the feature table.\
+qiime feature-table filter-features --i-table <feature table from 4> --p-min-frequency 2 --o-filtered-table <output filtered feature table>\
+\
+#Step 9. Remove singletons from representative sequences. \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf2 \CocoaLigature0 qiime feature-table filter-seqs --i-data <representative sequences from step 4> --i-table <feature table from step 8> --o-filtered-data <output filtered representative sequences>\cf0 \CocoaLigature1 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
+#Step 10. Remove reads from feature table coming from chloroplasts, mitochondria, and eukarya. \
+qiime taxa filter-table --i-table <feature table from step 8> --i-taxonomy <taxonomy from step 7> --p-exclude chloroplast,mitochondria,eukarya --o-filtered-table <output filtered feature table>\
+\
+#Step 11. Remove sequences from representative sequences coming from chloroplasts, mitochondria and eukarya. \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf2 \CocoaLigature0 qiime feature-table filter-seqs --i-data <representative sequences from step 9> --i-table <feature table from step 10> --o-filtered-data <output filtered representative sequences>\cf0 \CocoaLigature1 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
+#Step 12. Rarefy the feature table at the lowest read count (6963) among infant stool samples being analyzed.  \
+qiime feature-table rarefy --i-table <feature table from step 10> --p-sampling-depth 6963 --p-no-with-replacement --o-rarefied-table <output rarefied feature table>\
+\
+#Step 13. Select the subset of infant stool samples that will be used for subsequent analyses including a PCoA biplot. \
+qiime feature-table filter-samples --i-table <rarefied feature table from step 12> --m-metadata-file <list of infant stool samples to retain> --o-filtered-table <output filtered feature table>\
+\
+#Step 14. Build a phylogenetic tree \
+qiime phylogeny -\cf2 \CocoaLigature0 align-to-tree-mafft-fasttree --i-sequences <representative sequences from step 11> --o-alignment <output aligned sequences> --o-masked-alignment <output masked alignment> --o-tree <output unrooted tree> --o-rooted-tree <output rooted tree>\cf0 \CocoaLigature1 \
+\
+#Step 15. Measure beta-diversity\
+qiime diversity core-metrics-phylogenetic --i-table <feature table from step 13> --i-phylogeny <rooted phylogenetic tree from step 14> --p-sampling-depth 6963 --p-no-with-replacement --m-metadata-file <metadata file for samples> --output-dir <output diversity metrics>\
+\
+#Step 16. Generate feature table with relative frequency \
+qiime feature-table relative-frequency --i-table <feature table from step 13> --o-relative-frequency-table <output relative frequency feature table>\
+\
+#Step 17. Generate biplots for unweighted and weighted UniFrac distances. \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 qiime diversity pcoa-biplot --i-features <feature table from step 16> --i-pcoa <unweighted unifrac PCoA results from step 15> --o-biplot <output unweighted unifrac biplot>\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 qiime diversity pcoa-biplot --i-features <feature table from step 16> --i-pcoa <weighted unifrac PCoA results from step 15> --o-biplot <output weighted unifrac biplot>\
+ \
+#Step 18. Generate interactive PCoA biplots. \
+qiime emperor biplot --i-biplot <unweighted unifrac biplot from step 17> --m-sample-metadata-file <metadata file with sample info> --o-visualization <output visualization of unweighted unifrac biplot>\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 qiime emperor biplot --i-biplot <weighted unifrac biplot from step 17> --m-sample-metadata-file <metadata file with sample info> --o-visualization <output visualization of weighted unifrac biplot>}
