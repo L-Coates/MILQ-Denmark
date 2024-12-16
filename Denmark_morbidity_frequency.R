@@ -695,6 +695,21 @@ df.illness.medx.v6$infant.gender.mod <- paste(df.illness.medx.v6$f201_infgend_q1
 ggplot(df.illness.medx.v6, aes(x=visit.morbidity.rate, y=fct_reorder(cid,total.illness), fill=morbidity, alpha=value)) + geom_tile()+scale_alpha(range=c(0,1))+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+theme(text=element_text(size=8)) +geom_text(alpha=1,data=df.illness.medx.v6,aes(label=drug), color="black", size=1.5)+facet_wrap(~visit, scales="free_x")+ylab("infant gender, mode of delivery")+xlab("")+guides(alpha="none")+scale_y_discrete(breaks=c(df.illness.medx.v6$cid),labels=c(df.illness.medx.v6$infant.gender.mod))
 ggsave("morbidity.medication.per.infant.noCID.jpeg", plot=last_plot(), dpi=600, height=10, width=4, units="in")
 
+#make another, similar, figure that has the infants grouped by birth mode, then
+#gender (within birth mode). Make sure to change gender values from "boy" and "girl"
+#to "male" and "female" and to add "visit" for each visit number
+df.illness.medx.v6$f201_infgend_q10 <- gsub(pattern="girl", replacement="female", df.illness.medx.v6$f201_infgend_q10)
+df.illness.medx.v6$f201_infgend_q10 <- gsub(pattern="boy", replacement="male", df.illness.medx.v6$f201_infgend_q10)
+
+df.illness.medx.v6$visit <- paste("visit", as.character(df.illness.medx.v6$visit), sep=" ")
+
+#change morbidity percentage to second line on x axis
+df.illness.medx.v6$visit.morbidity.rate <- gsub(pattern=", ", replacement=",\n", df.illness.medx.v6$visit.morbidity.rate)
+
+ggplot(df.illness.medx.v6, aes(x=visit.morbidity.rate, y=fct_reorder(cid,total.illness), fill=morbidity, alpha=value)) + geom_tile()+scale_alpha(range=c(0,1))+theme(axis.text.x = element_text(vjust = 0.5))+theme(text=element_text(size=8)) +geom_text(alpha=1,data=df.illness.medx.v6,aes(label=drug), color="black", size=1.5)+facet_grid(f201_mod_q11+f201_infgend_q10~visit, scales="free", space="free")+ylab("infant gender, mode of delivery")+xlab("")+guides(alpha="none")+scale_y_discrete(breaks=c(df.illness.medx.v6$cid),labels=c(df.illness.medx.v6$infant.gender.mod)) +theme_bw()+theme(strip.text.y = element_text(angle = 0), axis.text.y=element_blank(), axis.ticks.y=element_blank(),axis.title.y = element_blank())
+
+ggsave("morbidity.medication.per.infant.grouped.by.mod.gender.tiff", plot=last_plot(), dpi=600, height=10, width=8, units="in", device="tiff")
+
 #STEP 9: adjusting the format of the data frame to make into table that can be 
 #merged
 visit2.info <- merge(visit2.morbidities, visit2.medication, by="mid", all=F) 
@@ -904,7 +919,7 @@ write.csv(metadata.v3, "infant.morbidities.medications.csv")
 #STEP 12: Gather information on the total reported cases of morbidity, duration of
 #morbidities, if they were diagnosed, and if they were treated.
 
-#gather the total number of diarrhea cases.
+#gather the total number of diarrhea cases. 
 diarrhea.cases <- redcap.wide[,c(1,grep(pattern="f[234]04_diarrhoea_q5_1$|f[234]04_diarrhoea[1234]_q6_1_[1234]$", colnames(redcap.wide)))]
 diarrhea.cases <- pivot_longer(data=diarrhea.cases, cols=c(2:16))
 diarrhea.cases <- diarrhea.cases[!is.na(diarrhea.cases$value),]
@@ -913,6 +928,7 @@ table(diarrhea.cases$value)
 #42 reports of diarrhea.
 length(unique(diarrhea.cases[diarrhea.cases$value=="1", ][["mid"]]))
 #35 infants
+
 #looking at total diarrhea cases per infant
 diarrhea.cases.per.infant <-data.frame(table(diarrhea.cases[diarrhea.cases$value=="1",][["mid"]]))
 summary(diarrhea.cases.per.infant$Freq)
@@ -1093,7 +1109,7 @@ venndiag.visit4.morbidities <- ggvenn(data=list.visit4, columns= c("diarrhea", "
 
 venndiag.visits234.morbidities <- grid.arrange(venndiag.visit2.morbidities, venndiag.visit3.morbidities, venndiag.visit4.morbidities, ncol=1, nrow=3)
 
-colored.morbidity.list <-ggplot(df.illness.medx.v6, aes(x=visit.morbidity.rate, y=fct_reorder(cid,total.illness), fill=morbidity, alpha=value)) + geom_tile()+scale_alpha(range=c(0,1))+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+theme(text=element_text(size=8)) +geom_text(alpha=1,data=df.illness.medx.v6,aes(label=drug), color="black", size=1.5)+facet_wrap(~visit, scales="free_x")+ylab("infant gender, mode of delivery")+xlab("")+guides(alpha="none")+scale_y_discrete(breaks=c(df.illness.medx.v6$cid),labels=c(df.illness.medx.v6$infant.gender.mod))
+colored.morbidity.list <-ggplot(df.illness.medx.v6, aes(x=visit.morbidity.rate, y=fct_reorder(cid,total.illness), fill=morbidity, alpha=value)) + geom_tile()+scale_alpha(range=c(0,1))+theme(axis.text.x = element_text(vjust = 0.5))+theme(text=element_text(size=8)) +geom_text(alpha=1,data=df.illness.medx.v6,aes(label=drug), color="black", size=1.5)+facet_grid(f201_mod_q11+f201_infgend_q10~visit, scales="free", space="free")+ylab("infant gender, mode of delivery")+xlab("")+guides(alpha="none")+scale_y_discrete(breaks=c(df.illness.medx.v6$cid),labels=c(df.illness.medx.v6$infant.gender.mod)) +theme_bw()+theme(strip.text.y = element_text(angle = 0), axis.text.y=element_blank(), axis.ticks.y=element_blank(),axis.title.y = element_blank())
 
 plot.to.print <- grid.arrange(colored.morbidity.list, venndiag.visits234.morbidities, widths=c(1, 0.48))
-ggsave("morbidity.medication.per.infant.noCID.withVennDiagrams.jpeg", plot=plot.to.print, dpi=600, height=10, width=10, units="in")
+ggsave("morbidity.medication.per.infant.noCID.withVennDiagrams.jpeg", device='tiff',plot=plot.to.print, dpi=600, height=10, width=10, units="in")
