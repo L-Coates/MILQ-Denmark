@@ -283,6 +283,7 @@ pcoa.unwunifrac.visit2 <- unweighted.unifrac.visit2$data$Vectors %>%
     right_join(metadata.v3[metadata.v3$visit=="2",]) %>%
     ggplot(aes(x=PC1, y=PC2, color=infant.antibiotic)) +
     geom_point()+
+    theme_bw()+
     xlab(paste("PC1", round(unweighted.unifrac.visit2$data$ProportionExplained[1]*100, digits=1), "%", sep=" "))+
     ylab(paste("PC2", round(unweighted.unifrac.visit2$data$ProportionExplained[2]*100, digits=1), "%", sep=" "))+
     theme(legend.position="top")+
@@ -293,24 +294,26 @@ pcoa.wunifrac.visit2 <- weighted.unifrac.visit2$data$Vectors %>%
     right_join(metadata.v3[metadata.v3$visit=="2",]) %>%
     ggplot(aes(x=PC1, y=PC2, shape=infant.gender, color=infant.gender)) +
     geom_point()+
+    theme_bw()+
     xlab(paste("PC1", round(weighted.unifrac.visit2$data$ProportionExplained[1]*100, digits=1), "%", sep=" "))+
     ylab(paste("PC2", round(weighted.unifrac.visit2$data$ProportionExplained[2]*100, digits=1), "%", sep=" "))+
     theme(legend.position="top")+
-    scale_color_manual(name="weighted UniFrac in visit 2: infant gender", values=c("blue", "#FF33FF"))+
-    scale_shape_manual(name = "weighted UniFrac in visit 2: infant gender", values=c(15, 17))
+    scale_color_manual(name="weighted UniFrac in visit 2: infant gender", values=c("blue", "#FF33FF"), labels=c("male", "female"))+
+    scale_shape_manual(name = "weighted UniFrac in visit 2: infant gender", values=c(15, 17), labels=c("male", "female"))
 
 pcoa.unwunifrac.visit4 <- unweighted.unifrac.visit4$data$Vectors %>%
     select(SampleID, PC1, PC2) %>%
     right_join(metadata.v3[metadata.v3$visit=="4",]) %>%
     ggplot(aes(x=PC1, y=PC2, color=(as.character(ExclusiveBreastfeeding.before.4months)))) +
     geom_point()+
+    theme_bw()+
     xlab(paste("PC1", round(unweighted.unifrac.visit4$data$ProportionExplained[1]*100, digits=1), "%", sep=" "))+
     ylab(paste("PC2", round(unweighted.unifrac.visit4$data$ProportionExplained[2]*100, digits=1), "%", sep=" "))+
     theme(legend.position="top")+
     scale_color_manual(values=c("purple", "green"), name = "unweighted UniFrac in visit 4: exclusive breastfeeding before 4 months of age")
 
 ggarrange(pcoa.unwunifrac.visit2,pcoa.wunifrac.visit2, pcoa.unwunifrac.visit4, ncol=1, nrow=3, labels="AUTO")
-ggsave("PCoA.unifrac.by.visit.jpeg", plot=last_plot(), height=12, width=8, dpi=600)
+ggsave("PCoA.unifrac.by.visit.tiff",device="tiff", plot=last_plot(), height=10, width=7, dpi=600)
 
 
 #STEP 7: Determine if beta-diversity in visit 2 was associated with morbidity
