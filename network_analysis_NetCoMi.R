@@ -70,31 +70,35 @@ taxa.names <- make.names(taxa.names, unique = TRUE)
 #Make all of the feature names within the phyloseq object correspond to the genus level designation
 taxa_names(phylobj.filtered.genus) <- taxa.names
 
-#important to note that when extracting the sample data (metadata) from the phyloseq
-#object, need to use the function data.frame(), not as.data.frame(), to change it
-#into a dataframe object that maaslin2 will recognize, otherwise it will still be 
-#recognized as a sample_data object if you use as.data.frame(). 
 feature.table.genus <- as.data.frame(t(otu_table(phylobj.filtered.genus)))
 
-#remove the genera that have an average of less than 2 reads. 
-genus.count.average <- data.frame(apply(X=feature.table.genus,MARGIN=2, FUN=mean))
-genus.count.average$genus <- rownames(genus.count.average)
-genus.count.average.keep <- genus.count.average[genus.count.average$apply.X...feature.table.genus..MARGIN...2..FUN...mean.>=2,]
+#determine the relative abundance at which to filter taxa. 
+phylobj.filtered.genus.relabund <- transform_sample_counts(phylobj.filtered.genus, function(x) x / sum(x) )
+feature.table.genus.relabund <- otu_table(phylobj.filtered.genus.relabund)
+genus.relabund.average <- data.frame(apply(X=feature.table.genus.relabund,MARGIN=1, FUN=mean))
+summary(genus.relabund.average$apply.X...feature.table.genus.relabund..MARGIN...1..FUN...mean.)
+#median is 0.000018 and 1st quartile is 0.0000011.  
+#These numbers are both quite low so choosing a number between them: 0.00001 (0.001 %) relative abundance at threshold.  
+genus.relabund.average$genus <- rownames(genus.relabund.average)
+genus.relabund.average.keep <- genus.relabund.average[genus.relabund.average$apply.X...feature.table.genus.relabund..MARGIN...1..FUN...mean.>=0.00001,]
+dim(genus.relabund.average.keep)
+#kept 136 out of 244 genera. 
 
 #filter the feature table
-feature.table.genus.filtered <- feature.table.genus[,c(which(colnames(feature.table.genus) %in% genus.count.average.keep$genus)),]
+feature.table.genus.filtered <- feature.table.genus[,c(which(colnames(feature.table.genus) %in% genus.relabund.average.keep$genus)),]
 
 #STEP 3: Determining microbial correlations with "spieceasi" measure
 
 colnames(feature.table.genus.filtered) <- gsub(pattern="^g__|^f__",replacement="",colnames(feature.table.genus.filtered))
 
-spieceasi.network <- netConstruct(data=feature.table.genus.filtered, dataType="counts", measure="spieceasi", adjust="lfdr",seed=12)
+#normalization is performed internally by spiec-easi function. 
+spieceasi.network <- netConstruct(data=feature.table.genus.filtered, dataType="counts", measure="spieceasi", adjust="lfdr", lfdrThresh = 0.05, sparsMethod="t-test", alpha=0.05, seed=12, verbose=3)
 spiec.easi.network.analyzed <- netAnalyze(spieceasi.network)
 
-jpeg("microbial.correlations.network.jpeg", res=600, width=20, height=20, units="cm")    
+tiff("SPIEC-EASI.microbial.correlations.network.FilteredGenera.At.0.001percent.tiff", res=600, width=30, height=25, units="cm")    
 plot(spiec.easi.network.analyzed, 
      nodeColor = "cluster",
-     repulsion = 0.8,
+     repulsion = 1.0,
      rmSingles = TRUE,
      labelScale = FALSE,
      cexLabels = 0.8,
@@ -105,7 +109,7 @@ plot(spiec.easi.network.analyzed,
      showTitle = TRUE,
      hubBorderCol = "black",
      cexTitle = 1)
-legend(0.7, 0.95, cex = 0.8, title = "estimated correlation:",
+legend(-1.0, 1.1, cex = 0.8, title = "estimated correlation:",
        legend = c("+","-"), lty = 1, lwd = 3, col = c("#009900","red"),
        bty = "n", horiz = TRUE)
 dev.off()
