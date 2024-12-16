@@ -16,6 +16,9 @@ This script contains the code used to determine infant age at first introduction
 ### "core_microbes.R"
 This script contains the code used to identify core microbial taxa (ASVs, species, genera, families) present in all/most samples and to determine the taxa (genera and families) that were particularly abundant among this cohort. 
 
+### "demographics_birth_mode_etc.R"
+This file contains the R code used to summarize demographic metadata (e.g. household size, parity), infant birth mode, and infant gender.
+
 ### "Denmark_morbidity_frequency.R"
 This file contains the R code used to determine the frequency of diarrhea, fever, vomiting, and medications in the infant Denmark cohort. 
 
