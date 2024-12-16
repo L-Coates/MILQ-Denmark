@@ -138,8 +138,14 @@ age.at.stool.v2 <- pivot_longer(data=age.at.stool, cols = c("visit 2", "visit 3"
 dim(age.at.stool.v2) #327 samples
 str(age.at.stool.v2)
 library(ggplot2)
-ggplot(data=age.at.stool.v2, aes(x=value,fill=visit))+geom_dotplot()+scale_x_continuous(breaks=c(1.0,3.5,6.0,8.49))+scale_y_continuous(limits=c(0,1), labels = c(0,5,10,15,20))+xlab("infant age at stool collection (months)")+ylab("number of infant stool samples")
-#save figure as "Denmark.infant.age.at.stool.collection.jpeg"
+ggplot(data=age.at.stool.v2, aes(x=value,fill=visit))+
+    geom_dotplot()+
+    theme_bw()+
+    scale_x_continuous(breaks=c(1.0,3.5,6.0,8.49))+
+    scale_y_continuous(limits=c(0,1), labels = c(0,5,10,15,20))+
+    xlab("infant age at stool collection (months)")+ylab("number of infant stool samples")
+ggsave("Denmark.infant.age.at.stool.collection.tiff", device="tiff", dpi=600)
+
 
 #STEP 4: calculate amount of time between subsequent stool samples for each infant
 #and plot as histograms for time between visits 2->3 and visits 3->4
@@ -150,7 +156,13 @@ age.at.stool.v3$`visits 3 - 4` <- age.at.stool.v3$`visit 4`-age.at.stool.v3$`vis
 #make into long format
 age.at.stool.v4 <- pivot_longer(data=age.at.stool.v3, cols = c("visits 2 - 3", "visits 3 - 4"), names_to = "sample points", values_drop_na = TRUE)
 
-ggplot(data=age.at.stool.v4, aes(x=value,fill=`sample points`))+geom_dotplot()+scale_x_continuous(breaks=c(1.0,1.5,2,2.5,3,3.5,4))+scale_y_continuous(labels = c(0,5,10,15,20))+xlab("time between stool collections (months)")+ylab("number of infant stool samples")
+ggplot(data=age.at.stool.v4, aes(x=value,fill=`sample points`))+
+    geom_dotplot()+scale_x_continuous(breaks=c(1.0,1.5,2,2.5,3,3.5,4))+
+    theme_bw()+
+    scale_y_continuous(labels = c(0,5,10,15,20))+
+    xlab("time between stool collections (months)")+
+    ylab("number of infant stool samples")
+ggsave("Denmark.time.between.stool.collection.tiff", device="tiff", dpi=600)
 
 #STEP 5: look at stool storage and time passed until placement in freezer to estimate
 #time stool was left at room temperature before freezer storage. 
