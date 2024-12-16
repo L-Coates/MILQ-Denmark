@@ -215,7 +215,7 @@ taxa_names(phylobj.genus.rarefied) <- taxa.names
 
 genus.counts.rarefied <- psmelt(phylobj.genus.rarefied)
 
-genus.counts.rarefied.RelAbund <- data.frame(tapply(X=genus.counts.rarefied$Abundance, INDEX=genus.counts.rarefied$Genus, FUN=median))
+genus.counts.rarefied.RelAbund <- data.frame(tapply(X=genus.counts.rarefied$Abundance, INDEX=genus.counts.rarefied$OTU, FUN=median))
 
 #gathering counts at the family level
 phylobj.family.rarefied <- tax_glom(phylobj.rarefied.filtered, 'Family', NArm=F)
@@ -250,4 +250,5 @@ taxa_names(phylobj.family.rarefied) <- taxa.names
 
 family.counts.rarefied <- psmelt(phylobj.family.rarefied)
 
-family.counts.rarefied.RelAbund <- data.frame(tapply(X=family.counts.rarefied$Abundance, INDEX=family.counts.rarefied$Family, FUN=median))
+family.counts.rarefied.RelAbund <- data.frame(tapply(X=family.counts.rarefied$Abundance, INDEX=family.counts.rarefied$OTU, FUN=median))
+
