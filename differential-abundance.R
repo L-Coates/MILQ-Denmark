@@ -93,8 +93,11 @@ print(ancom.md1.output.species.res[ancom.md1.output.species.res$diff_stool_age_d
 
 #make a figure of the log fold change of these species in relation to age in days. 
 species.diff.by.age <- ancom.md1.output.species.res[ancom.md1.output.species.res$diff_stool_age_days=="TRUE",]
-ggplot(aes(x=reorder(taxon,-lfc_stool_age_days), y=lfc_stool_age_days), data=species.diff.by.age)+geom_col()+ylab("infant age at stool collection (days)")+xlab("")+theme(axis.text.x = element_text(angle = 45, hjust=1))
-
+ggplot(aes(x=reorder(taxon,-lfc_stool_age_days), y=lfc_stool_age_days), data=species.diff.by.age)+
+    geom_col()+
+    theme_bw()+
+    ylab("infant age at stool collection (days)")+xlab("")+
+    theme(axis.text.x = element_text(angle = 45, hjust=1))
 
 #cut down models at species level
 set.seed(123)
@@ -136,8 +139,16 @@ rownames(taxonomy4)=NULL
 taxonomy4 <- distinct(taxonomy4)
 taxonomy4$Genus <- gsub(pattern=" g__", replacement="", taxonomy4$Genus)
 genus.diff.by.age.taxonomy <- taxonomy4[c(which(taxonomy4$Genus %in% genus.diff.by.age$taxon)),]
-ggplot(aes(x=reorder(taxon,-lfc_stool_age_days), y=lfc_stool_age_days, fill=lfc_stool_age_days), data=genus.diff.by.age)+geom_col()+geom_errorbar(aes(ymin = lfc_stool_age_days - se_stool_age_days, ymax = lfc_stool_age_days + se_stool_age_days), width = 0.2, position = position_dodge(0.05), color = "black")+ylab("log(fold change) of normalized genus counts with infant age (days)")+xlab("")+theme(axis.text.x = element_text(angle = 45, hjust=1))+scale_fill_gradient2(low="blue", high="red", mid="white", midpoint=0)+labs(fill="log(fold change)")
-ggsave("stool.genus.logFC.by.age.jpeg", dpi=600, plot=last_plot(), width=10, height=6.5)
+ggplot(aes(x=reorder(taxon,-lfc_stool_age_days), y=lfc_stool_age_days, fill=lfc_stool_age_days), data=genus.diff.by.age)+
+    geom_col()+
+    theme_bw()+
+    geom_errorbar(aes(ymin = lfc_stool_age_days - se_stool_age_days, ymax = lfc_stool_age_days + se_stool_age_days), width = 0.2, position = position_dodge(0.05), color = "black")+
+    ylab("log(fold change) of normalized genus counts with infant age (days)")+
+    xlab("")+
+    theme(axis.text.x = element_text(angle = 45, hjust=1))+
+    scale_fill_gradient2(low="blue", high="red", mid="white", midpoint=0)+
+    labs(fill="log(fold change)")
+ggsave("stool.genus.logFC.by.age.tiff", device="tiff", dpi=600, plot=last_plot())
 
 #cut down model to remove covariates that were not significantly associated with a genus
 set.seed(123)
@@ -934,8 +945,39 @@ wilcox.test(x=(granulicatella.rarefied[granulicatella.rarefied$infant.diarrhea==
 #significant by wilcox test, with diarrhea group greater than healthy group. 
 granulicatella.rarefied$Relative.Abundance <- (granulicatella.rarefied$Abundance/6963)*100
 
-ggplot(aes(x=infant.diarrhea, y=Relative.Abundance, color=as.factor(infant.diarrhea)), data=granulicatella.rarefied)+geom_boxplot()+xlab("diarrhea")+ylab("Granulicatella relative abundance %")+scale_x_discrete(labels=c("no\nn=287", "yes\nn=40"))+scale_color_manual(values=c(no="black", yes="#F8766D"))+theme(legend.position="none")
-ggsave("granulicatella.vs.diarrhea.jpeg", dpi=600, width=5, height=5, plot=last_plot())
+ggplot(aes(x=infant.diarrhea, y=Relative.Abundance, color=as.factor(infant.diarrhea)), data=granulicatella.rarefied)+
+    geom_boxplot()+
+    theme_bw()+
+    xlab("diarrhea")+
+    ylab("Granulicatella relative abundance %")+
+    scale_x_discrete(labels=c("no\nn=287", "yes\nn=40"))+
+    scale_color_manual(values=c(no="black", yes="#F8766D"))+
+    theme(legend.position="none")
+ggsave("granulicatella.vs.diarrhea.tiff", device="tiff", dpi=600, plot=last_plot())
+
+#graph the mean and standard deviation as well.
+granulicatella.rarefied.means.sd <- granulicatella.rarefied %>%   
+    group_by(infant.diarrhea) %>%  
+    summarize(mean_N=mean(Relative.Abundance),  
+              sd_N=sd(Relative.Abundance),  
+              N_N=n(),  
+              se=sd_N/sqrt(N_N),  
+              upper_limit=mean_N+se,  
+              lower_limit=mean_N-se  
+    )  
+
+ggplot(aes(x=infant.diarrhea, y=mean_N, color=as.factor(infant.diarrhea)), data=granulicatella.rarefied.means.sd)+
+    geom_bar(stat="identity", fill="white")+
+    geom_errorbar(aes(ymin=lower_limit, ymax=upper_limit), width=0.5)+
+    theme_bw()+
+    xlab("diarrhea")+
+    ylab("Granulicatella relative abundance (%)")+
+    scale_x_discrete(labels=c("no\nn=287", "yes\nn=40"))+
+    scale_color_manual(values=c(no="black", yes="#F8766D"))+
+    geom_point(aes(x=infant.diarrhea, y=Relative.Abundance), data=granulicatella.rarefied, color="black", position=position_jitter(width=0.08), alpha=0.3)+
+    theme(legend.position="none")
+
+ggsave("diarrhea.vs.Granulicatella.relativeabundance.MeanSE.tiff", device="tiff", dpi=600, width=3, height=4)
 
 #also do the graph with non-rarefied counts but with relative abundance
 phylobj.genus <- tax_glom(phylobj.filtered, 'Genus', NArm=F)
@@ -952,10 +994,29 @@ ggplot(aes(x=infant.diarrhea, y=Abundance), data=granulicatella)+geom_boxplot()+
 #since Granulicatella was positively associated with age too, making a scatter plot
 #of age vs. Granulicatella abundance with color by diarrhea. 
 
-a <- ggplot(aes(x=stool_age_days, y=Relative.Abundance), data=(granulicatella.rarefied[granulicatella.rarefied$infant.diarrhea.ever.in.study=="no",]))+geom_line(aes(group=mid),color="grey", data=(granulicatella.rarefied[granulicatella.rarefied$infant.diarrhea.ever.in.study=="no",]))+geom_point(aes(color=infant.diarrhea), data=(granulicatella.rarefied[granulicatella.rarefied$infant.diarrhea.ever.in.study=="no",]))+scale_y_continuous("", lim=c(0.0, 1.15))+scale_color_manual(values=c(no="black", yes="#F8766D"))+scale_x_continuous("age (days)",lim=c(0,260))+labs(color="diarrhea")+ggtitle("A\ndiarrhea never reported")+theme(legend.direction="horizontal")
-b <- ggplot(aes(x=stool_age_days, y=Relative.Abundance), data=(granulicatella.rarefied[granulicatella.rarefied$infant.diarrhea.ever.in.study=="yes",]))+geom_line(aes(group=mid), color="grey", data=(granulicatella.rarefied[granulicatella.rarefied$infant.diarrhea.ever.in.study=="yes",]))+geom_point(aes(color=infant.diarrhea), data=(granulicatella.rarefied[granulicatella.rarefied$infant.diarrhea.ever.in.study=="yes",]))+scale_y_continuous("Granulicatella relative abundance %",lim=c(0.0, 1.15))+scale_color_manual(values=c(no="black", yes="#F8766D"))+scale_x_continuous("age (days)",lim=c(0,260))+labs(color="diarrhea")+ggtitle("B\ndiarrhea reported at least once")+theme(legend.direction="horizontal")
-ggarrange(a,b, legend.grob = get_legend(b), legend=c("top"))
-ggsave("age.vs.granulicatella.jpeg", plot=last_plot(), dpi=600, height=6,width=10, units="in")
+a <- ggplot(aes(x=stool_age_days, y=Relative.Abundance), data=(granulicatella.rarefied[granulicatella.rarefied$infant.diarrhea.ever.in.study=="no",]))+
+    geom_line(aes(group=mid),color="grey", data=(granulicatella.rarefied[granulicatella.rarefied$infant.diarrhea.ever.in.study=="no",]))+
+    geom_point(aes(color=infant.diarrhea), data=(granulicatella.rarefied[granulicatella.rarefied$infant.diarrhea.ever.in.study=="no",]))+
+    theme_bw()+
+    scale_y_continuous("Granulicatella relative abundance %", lim=c(0.0, 1.15))+
+    scale_color_manual(values=c(no="black", yes="#F8766D"))+
+    scale_x_continuous("age (days)",lim=c(0,260))+
+    labs(color="diarrhea")+
+    ggtitle("A\ndiarrhea never reported")+
+    theme(legend.direction="horizontal")
+b <- ggplot(aes(x=stool_age_days, y=Relative.Abundance), data=(granulicatella.rarefied[granulicatella.rarefied$infant.diarrhea.ever.in.study=="yes",]))+
+    geom_line(aes(group=mid), color="grey", data=(granulicatella.rarefied[granulicatella.rarefied$infant.diarrhea.ever.in.study=="yes",]))+
+    geom_point(aes(color=infant.diarrhea), data=(granulicatella.rarefied[granulicatella.rarefied$infant.diarrhea.ever.in.study=="yes",]))+
+    theme_bw()+
+    scale_y_continuous("",lim=c(0.0, 1.15))+
+    scale_color_manual(values=c(no="black", yes="#F8766D"))+
+    scale_x_continuous("age (days)",lim=c(0,260))+
+    labs(color="diarrhea")+
+    ggtitle("B\ndiarrhea reported at least once")+
+    theme(legend.direction="horizontal")
+
+ggarrange(a,b, legend.grob = get_legend(b), legend=c("bottom"))
+ggsave("age.vs.granulicatella.tiff", device="tiff", plot=last_plot(), dpi=600, height=10,width=10, units="in")
 
 #Part 6: determine if Lactobacillus rhamnosus is differentially abundant by probiotic use
 #when using rarefied counts and non-parametric testing
@@ -973,8 +1034,14 @@ wilcox.test(x=(Lrhamnosus.rarefied.vt2[Lrhamnosus.rarefied.vt2$infant.probiotic=
 #yes, L.rhamnosus was significantly greater in stool from infants that had probiotics 
 #than in stool from infants that didn't have probiotic in visit 2. 
 table(Lrhamnosus.rarefied.vt2$infant.probiotic) #24 had probiotic and 85 did not
-ggplot(aes(x=infant.probiotic, y=((Abundance)/6963 *100)), data=Lrhamnosus.rarefied.vt2)+geom_violin()+xlab("probiotic use")+ylab("L. rhamnosus relative abundance %")+ggtitle("visit 2 stool samples")+scale_x_discrete(labels=c("no\nn=85", "yes\nn=24"))
-ggsave("Lactobacillus.rhamnosus.vs.probiotic.visit2.jpeg", plot=last_plot(), dpi=600, height=4, width=5)
+ggplot(aes(x=infant.probiotic, y=((Abundance)/6963 *100)), data=Lrhamnosus.rarefied.vt2)+
+    geom_boxplot()+
+    theme_bw()+
+    xlab("probiotic use")+
+    ylab("L. rhamnosus relative abundance %")+
+    ggtitle("visit 2 stool samples")+
+    scale_x_discrete(labels=c("no\nn=85", "yes\nn=24"))
+ggsave("Lactobacillus.rhamnosus.vs.probiotic.visit2.tiff", device="tiff", plot=last_plot(), dpi=600, height=4, width=4)
 
 
 #Part 7: among the 24 infants that received probiotic in visit 2 and were healthy,
@@ -1021,8 +1088,15 @@ table(bacteroidales.rarefied.visit3$infant.fever)
 
 #step 4: graph and save. 
 ggplot(aes(x=infant.fever,y=(relative.abundance)), data=bacteroidales.rarefied.visit3)+ geom_violin()
-ggplot(aes(x=infant.fever,y=(relative.abundance), color=as.factor(infant.fever)), data=bacteroidales.rarefied.visit3)+ geom_boxplot()+xlab("fever in visit 3")+ylab("Bacteroidales relative abundance %") +scale_x_discrete(labels=c("no\nn=68", "yes\nn=41"))+scale_color_manual(values=c(no="black", yes="#00BA38"))+theme(legend.position = "none")
-ggsave("fever.visit3.vs.Bacteroidales.jpeg", plot=last_plot(), dpi=600, width=10, height=10, units="cm")
+ggplot(aes(x=infant.fever,y=(relative.abundance), color=as.factor(infant.fever)), data=bacteroidales.rarefied.visit3)+
+    geom_boxplot()+
+    theme_bw()+
+    xlab("fever in visit 3")+
+    ylab("Bacteroidales relative abundance %")+
+    scale_x_discrete(labels=c("no\nn=68", "yes\nn=41"))+
+    scale_color_manual(values=c(no="black", yes="#00BA38"))+
+    theme(legend.position = "none")
+ggsave("fever.visit3.vs.Bacteroidales.tiff", device="tiff", plot=last_plot(), dpi=600, width=3, height=3, units="in")
 
 #step 5: create a phyloseq object with count summation at the Phylum level
 phylobj.rarefied.phylum<- tax_glom(phylobj.rarefied, 'Phylum', NArm=F)
