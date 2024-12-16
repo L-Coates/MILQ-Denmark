@@ -67,5 +67,12 @@ table(vaccines.long[vaccines.long$visit=="4", "vaccinated"]) #82 vaccinated, 27 
 
 fever.rates.among.vaccinated <- data.frame(visit=c("2", "2", "3", "3", "4", "4"), total.vaccinated=c(10,99, 107, 2, 82, 27), vaccinated=c("yes", "no"), fever.rate=c("40 %", "4 %", "38 %","0 %", "39 %","37 %"), row.names = NULL)
 
-ggplot(aes(x=visit,y=total.vaccinated, fill=as.factor(vaccinated), label=fever.rate), data=fever.rates.among.vaccinated)+geom_bar(stat="identity")+scale_fill_manual(values=c("black", "brown"))+labs(fill="vaccinated")+ylab("number of infants")+scale_y_continuous(breaks=c(0, 30, 60, 90, 109), limits=c(0,109))+geom_text(size = 3, position = position_stack(vjust = 0.5), color="white")+theme_dark()
-ggsave(filename="total_vaccinated_infants_and_fever_rates_by_visit.jpeg",plot=last_plot(), dpi=600, width=4, height=3, units="in")
+ggplot(aes(x=visit,y=total.vaccinated, fill=as.factor(vaccinated), label=fever.rate), data=fever.rates.among.vaccinated)+
+    geom_bar(stat="identity")+
+    scale_fill_manual(values=c("black", "brown"))+
+    labs(fill="vaccinated")+
+    ylab("number of infants")+
+    scale_y_continuous(breaks=c(0, 30, 60, 90, 109), limits=c(0,109))+
+    geom_text(size = 3, position = position_stack(vjust = 0.5), color="white")+
+    theme_bw()
+ggsave(filename="total_vaccinated_infants_and_fever_rates_by_visit.tiff",device="tiff", plot=last_plot(), dpi=600)
