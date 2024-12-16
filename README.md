@@ -40,8 +40,14 @@ This script contains the code used to identify microbial genera correlations in 
 ### "predicting_morbidity_outcomes_from_alpha_diversity.R"
 This script contains the code used to determine if infant stool alpha diversity in visit 2 is predictive of infant diarrhea, fever, or vomiting in visits 3 and/or 4. Logistic regression models were generated and the performance of the models were assessed with confusion matrices and ROC AUC.  
 
+### "proximity_of_stool_collection_to_morbidity_and_questionnaire.R"
+This file contains the R code used to determine how many days passed between the morbidity questionnaire and infant stool collection and to determine relative timing of stool collection to morbidity (diarrhea, fever, or vomit) in the same visit. 
+
 ### "qiime2-scripts.rtf"
 This file contains a collation of qiime2 scripts executed on a high performance computing cluster. 
+
+### "relating_fever_to_vaccinations.R"
+This file contains the R code used to relate infant vaccination to infant fever in the same visit.
 
 ### "taxaHFE.commands.txt"
 These are the commands used with taxaHFE version 2.0 to identify taxa from visit 2 stool samples potentially associated with diarrhea, fever, or vomiting in visit 3 and/or visit 4.
