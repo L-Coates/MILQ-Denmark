@@ -31,6 +31,9 @@ This file contains the R code used to test for differential abundance of stool m
 ### "exploring_taxa_from_taxaHFE_output.R"
 This file contains the code used to explore the microbial taxa from visit 2 that were identified with "taxaHFE 2.0" as potentially associated with diarrhea, fever, or vomitting in visits 3 and/or 4. Taxa identified as important in predicting infant morbidity were included in random forest models. Model performance was determined from a confusion matrix and ROC AUC. Feature importance and shapley values was determined to assess the contribution of variables to the predictive power of the model. Taxa identified as important by taxaHFE were also investigated for differential abundance by infant morbidity (using wilcoxon rank sum test).  
 
+### "formating_hierarchichal_data.R" 
+This file contains the R code used to format the taxonomic data for taxaHFE use.
+
 ### "network_analysis_NetCoMi.R"
 This script contains the code used to identify microbial genera correlations in the infant stool, across all visits, using NetCoMi. 
 
