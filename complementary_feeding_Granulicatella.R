@@ -286,10 +286,24 @@ table(granulicatella.rarefied$Abundance>0) #60 samples had a count above zero.
 granulicatella.rarefied$Relative.Abundance <- (granulicatella.rarefied$Abundance/6963)*100
 
 library(ggpubr)
-ggplot(aes(x=stool_age_days, y=Relative.Abundance,group=mid, col=complementary.feeding.age.days), data=granulicatella.rarefied)+geom_line()+scale_color_gradient2(low="red", mid="green", high="blue", midpoint=(3.49*30.4375))+geom_point()+xlab("age at stool collection (days)")+ylab("Granulicatella relative abundance %")+labs(color="age at first consumption of\nnon-breastmilk fluid/food (days)")
+ggplot(aes(x=stool_age_days, y=Relative.Abundance,group=mid, col=complementary.feeding.age.days), data=granulicatella.rarefied)+
+    geom_line()+
+    scale_color_gradient2(low="red", mid="green", high="blue", midpoint=(3.49*30.4375))+
+    geom_point()+
+    theme_bw()+
+    xlab("age at stool collection (days)")+
+    ylab("Granulicatella relative abundance %")+
+    labs(color="age at first consumption of\nnon-breastmilk fluid/food (days)")
 ggsave("age.complementary.feeding.vs.granulicatella.jpeg", plot=last_plot(), dpi=600, height=6,width=10, units="in")
 
-ggplot(aes(x=stool_age_days, y=Relative.Abundance,group=mid, col=complementary.feeding.age.days.notincluding.water), data=granulicatella.rarefied)+geom_line()+scale_color_gradient2(low="red", mid="green", high="blue", midpoint=(3.49*30.4375))+geom_point()+xlab("age at stool collection (days)")+ylab("Granulicatella relative abundance %")+labs(color="age of fluid/food introduction,\nnot including water (days)")
+ggplot(aes(x=stool_age_days, y=Relative.Abundance,group=mid, col=complementary.feeding.age.days.notincluding.water), data=granulicatella.rarefied)+
+    geom_line()+
+    scale_color_gradient2(low="red", mid="green", high="blue", midpoint=(3.49*30.4375))+
+    geom_point()+
+    theme_bw()+
+    xlab("age at stool collection (days)")+
+    ylab("Granulicatella relative abundance %")+
+    labs(color="age of fluid/food introduction,\nnot including water (days)")
 
 #STEP 5: make a box plot of age of complementary feeding for infants that didn't
 #have Granulicatella above 0.00% versus infants that did have Granulicatella. 
@@ -314,17 +328,38 @@ wilcox.test(x=age.v3[age.v3$Granulicatella.detected=="no","complementary.feeding
 #lower age of complementary fluids/food introduction among the infants that didn't
 #have Granulicatella detected in their stool. 
 
-ggplot(aes(x=Granulicatella.detected, y=complementary.feeding.age.days), data=age.v3) + geom_boxplot() +geom_jitter() + xlab("Granulicatella relative abundance > 0.00 %")+ylab("age at first consumption of\nnon-breastmilk fluid/food (days)")
+ggplot(aes(x=Granulicatella.detected, y=complementary.feeding.age.days), data=age.v3) +
+    geom_boxplot()+
+    theme_bw()+
+    geom_jitter()+
+    xlab("Granulicatella relative abundance > 0.00 %")+ylab("age at first consumption of\nnon-breastmilk fluid/food (days)")
 ggsave("age.complementary.feeding.vs.Granulicatella.detection.jpeg", plot=last_plot())
 
-ggplot(aes(x=Granulicatella.detected, y=complementary.feeding.age.notincluding.water.days), data=age.v3) + geom_boxplot() +geom_jitter() + xlab("Granulicatella relative abundance > 0.00 %")+ylab("age at first consumption of\nnon-breastmilk fluid/food (days)")
+ggplot(aes(x=Granulicatella.detected, y=complementary.feeding.age.notincluding.water.days), data=age.v3) +
+    geom_boxplot()+
+    theme_bw()+
+    geom_jitter() +
+    xlab("Granulicatella relative abundance > 0.00 %")+
+    ylab("age at first consumption of\nnon-breastmilk fluid/food (days)")
 
 #making a grid of two plots: 1) the earlier scatter plot showing Granulicatella
 #abundance over time with coloring by age of complementary feeding; and 2) this
 #recent box plot of age at complementary feeding in infants that never had Granulicatella
 #in their stool and those that did at least in one stool. 
-a <- ggplot(aes(x=stool_age_days, y=Relative.Abundance,group=mid, col=complementary.feeding.age.days), data=granulicatella.rarefied)+geom_line()+scale_color_gradient2(low="red", mid="green", high="blue", midpoint=(3.49*30.4375))+geom_point()+xlab("age at stool collection (days)")+ylab("Granulicatella relative abundance %")+labs(color="age at first consumption of\nnon-breastmilk fluid/food (days)")
-b <- ggplot(aes(x=Granulicatella.detected, y=complementary.feeding.age.days), data=age.v3) + geom_boxplot() +geom_jitter() + xlab("Granulicatella relative abundance > 0.00 %")+ylab("age at first consumption of\nnon-breastmilk fluid/food (days)")
+a <- ggplot(aes(x=stool_age_days, y=Relative.Abundance,group=mid, col=complementary.feeding.age.days), data=granulicatella.rarefied)+
+    geom_line()+
+    theme_bw()+
+    scale_color_gradient2(low="red", mid="green", high="blue", midpoint=(3.49*30.4375))+
+    geom_point()+
+    xlab("age at stool collection (days)")+
+    ylab("Granulicatella relative abundance %")+
+    labs(color="age at first consumption of\nnon-breastmilk fluid/food (days)")
+b <- ggplot(aes(x=Granulicatella.detected, y=complementary.feeding.age.days), data=age.v3) + 
+    geom_boxplot() +
+    geom_jitter() +
+    theme_bw()+
+    xlab("Granulicatella relative abundance > 0.00 %")+
+    ylab("age at first consumption of\nnon-breastmilk fluid/food (days)")
 ggarrange(a,b, ncol=2, nrow=1, widths=c(2,1))
-ggsave("scatterplot.complementary.feeding.vs.Granulicatella.boxplot.Granulicatella.presence.vs.complementary.feeding.jpeg", plot=last_plot(), dpi=600, height=6,width=11, units="in")
+ggsave("scatterplot.complementary.feeding.vs.Granulicatella.boxplot.Granulicatella.presence.vs.complementary.feeding.tiff", device="tiff", plot=last_plot(), dpi=600, height=6,width=11, units="in")
 
