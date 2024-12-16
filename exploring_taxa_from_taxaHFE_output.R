@@ -292,14 +292,43 @@ p.adjust(p=c(0.07642, 0.001443, 0.01206), method="fdr")
 #step 7: make a combined plot (A, B, C) of the feature importance and Staphylococcales and Haemophilus graphs
 diarrhea.RF.feature.importance.plot <- diarrhea.RF.feature.importance %>%
     mutate(feature = fct_reorder(feature, feature.importance)) %>%
-    ggplot(aes(y=feature, x=feature.importance))+geom_col(aes(fill=feature.importance), color="black")+ scale_fill_gradient(low = "black", high="yellow")+scale_y_discrete(labels=c("Prevotella timonensis", "Flavobacteriales", "Rhodoferax", "Sutterella wadsworthensis", "infant diarrhea in visit 2", "household size\n(<= 3 or > 3)", "Haemophilus","Bacteroides uniformis","Corynebacteriales", "Staphylococcales", "Bacteroides vulgatus"))+xlab("permutation feature importance")+labs(fill="feature importance")
+    ggplot(aes(y=feature, x=feature.importance))+geom_col(aes(fill=feature.importance), color="black")+
+    theme_bw()+
+    scale_fill_gradient(low = "black", high="yellow")+
+    scale_y_discrete(labels=c("Prevotella timonensis", "Flavobacteriales", "Rhodoferax", "Sutterella wadsworthensis", "infant diarrhea in visit 2", "household size\n(<= 3 or > 3)", "Haemophilus","Bacteroides uniformis","Corynebacteriales", "Staphylococcales", "Bacteroides vulgatus"))+
+    xlab("permutation feature importance")+
+    labs(fill="feature importance")
 
-shap.viz.diarrhea.RF.svimportance.plot<- shap.viz.diarrhea.RF.svimportance+scale_y_discrete(labels=c("Rhodoferax","Flavobacteriales","Prevotella timonensis", "infant diarrhea in visit 2", "Sutterella wadsworthensis", "household size\n(<= 3 or > 3)","Corynebacteriales","Bacteroides vulgatus","Bacteroides uniformis","Staphylococcales", "Haemophilus"))
-diarrhea.staphylococcales <-ggplot(aes(x=infant.diarrhea.in.visit3.or.visit4, y=Abundance, color=as.factor(infant.diarrhea.in.visit3.or.visit4)),data=melted.alltaxa.Staphylococcales)+geom_boxplot()+scale_x_discrete(labels=c("no\nn=80", "yes\nn=29"))+scale_color_manual(values=c("black", "#F8766D"))+theme(legend.position="none")+xlab("diarrhea in visits 3 or 4")+ylab("Staphylococcales relative abundance (%)")+facet_zoom(ylim=c(0,5))
-diarrhea.haemophilus <-ggplot(aes(x=infant.diarrhea.in.visit3.or.visit4, y=Abundance, color=as.factor(infant.diarrhea.in.visit3.or.visit4)),data=melted.alltaxa.Haemophilus)+geom_boxplot()+scale_x_discrete(labels=c("no\nn=80", "yes\nn=29"))+scale_color_manual(values=c("black", "#F8766D"))+theme(legend.position="none")+xlab("diarrhea in visits 3 or 4")+ylab("Haemophilus relative abundance (%)")+facet_zoom(ylim=c(0,2.5))
+shap.viz.diarrhea.RF.svimportance.plot<- shap.viz.diarrhea.RF.svimportance+
+    theme_bw()+
+    scale_y_discrete(labels=c("Rhodoferax","Flavobacteriales","Prevotella timonensis", "infant diarrhea in visit 2", "Sutterella wadsworthensis", "household size\n(<= 3 or > 3)","Corynebacteriales","Bacteroides vulgatus","Bacteroides uniformis","Staphylococcales", "Haemophilus"))+
+    ylab("feature")
 
-plot_grid(diarrhea.RF.feature.importance.plot,shap.viz.diarrhea.RF.svimportance.plot, diarrhea.staphylococcales, diarrhea.haemophilus, ncol=2, nrow=2, labels=LETTERS[1:4])
-ggsave("diarrhea.RF.model.featureimport.SHAP.Staphylococcales.Haemophilus.jpeg", plot=last_plot(), width=14, height=10, units=c("in"), dpi=600)
+diarrhea.staphylococcales <-ggplot(aes(x=infant.diarrhea.in.visit3.or.visit4, y=Abundance, color=as.factor(infant.diarrhea.in.visit3.or.visit4)),data=melted.alltaxa.Staphylococcales)+
+    geom_boxplot()+
+    theme_bw()+
+    scale_x_discrete(labels=c("no\nn=80", "yes\nn=29"))+
+    scale_color_manual(values=c("black", "#F8766D"))+
+    theme(legend.position="none")+
+    xlab("diarrhea in visits 3 or 4")+
+    ylab("Staphylococcales relative abundance (%)")+
+    facet_zoom(ylim=c(0,5), zoom.size=1)
+
+diarrhea.haemophilus <-ggplot(aes(x=infant.diarrhea.in.visit3.or.visit4, y=Abundance, color=as.factor(infant.diarrhea.in.visit3.or.visit4)),data=melted.alltaxa.Haemophilus)+
+    geom_boxplot()+
+    theme_bw()+
+    scale_x_discrete(labels=c("no\nn=80", "yes\nn=29"))+
+    scale_color_manual(values=c("black", "#F8766D"))+
+    theme(legend.position="none")+
+    xlab("diarrhea in visits 3 or 4")+
+    ylab("Haemophilus relative abundance (%)")+
+    facet_zoom(ylim=c(0,2.5), zoom.size=1)
+
+first.col.diarrhea <- plot_grid(diarrhea.RF.feature.importance.plot,shap.viz.diarrhea.RF.svimportance.plot, ncol=1, nrow=2, labels=LETTERS[1:2])
+second.col.diarrhea <- plot_grid(diarrhea.staphylococcales,diarrhea.haemophilus, ncol=1, nrow=2, labels=LETTERS[3:4])
+first.second.col.diarrhea <- plot_grid(first.col.diarrhea,second.col.diarrhea, ncol=2, nrow=1, rel_widths = c(1,0.7))
+first.second.col.diarrhea
+ggsave("diarrhea.RF.model.featureimport.SHAP.Staphylococcales.Haemophilus.tiff", devic="tiff", plot=last_plot(), width=12, height=8,units=c("in"), dpi=600)
 
 #Part 3: Among the taxa flagged as potentially associated with fever in visit 3,4,
 #look for associations using random forest.  
@@ -426,12 +455,33 @@ wilcox.test(x=melted.alltaxa[melted.alltaxa$taxon==" p__Actinobacteriota" & melt
 #step 7: make a combined plot (A, B, C) of the feature importances and the Actinobacteriota
 fever.RF.feature.importance.plot <- fever.RF.feature.importance %>%
     mutate(feature = fct_reorder(feature, feature.importance)) %>%
-    ggplot(aes(y=feature, x=feature.importance))+geom_col(aes(fill=feature.importance), color="black")+ scale_fill_gradient(low = "black", high="yellow")+scale_y_discrete(labels=c("Bacilli", "Clostridium sensu stricto 1,\nspecies: human gut", "infant fever in visit 2", "Negativicutes", "household size\n(<= 3 or > 3)","Bacteroides fragilis","Actinobacteriota"))+xlab("permutation feature importance")+labs(fill="feature importance")
+    ggplot(aes(y=feature, x=feature.importance))+
+    theme_bw()+
+    geom_col(aes(fill=feature.importance), color="black")+ 
+    scale_fill_gradient(low = "black", high="yellow")+
+    scale_y_discrete(labels=c("Bacilli", "Clostridium sensu stricto 1,\nspecies: human gut", "infant fever in visit 2", "Negativicutes", "household size\n(<= 3 or > 3)","Bacteroides fragilis","Actinobacteriota"))+
+    xlab("permutation feature importance")+
+    labs(fill="feature importance")
 
-shap.viz.fever.RF.svimportance.plot <- shap.viz.fever.RF.svimportance+scale_y_discrete(labels=c("household size\n(<= 3 or > 3)","infant fever in visit 2", "Clostridium sensu stricto 1,\nspecies: human gut", "Bacilli","Bacteroides fragilis","Negativicutes", "Actinobacteriota"))
-fever.actinobacteriota <- ggplot(aes(x=infant.fever.in.visit3.or.visit4, color=as.factor(infant.fever.in.visit3.or.visit4), y=Abundance),data=melted.alltaxa[melted.alltaxa$taxon==" p__Actinobacteriota",])+geom_boxplot()+scale_x_discrete(labels=c("no\nn=46", "yes\nn=63"))+scale_color_manual(values=c("black", "#00BA38"))+theme(legend.position = "none")+xlab("infant fever in visits 3 or 4")+ylab("Actinobacteriota relative abundance (%)")
-plot_grid(fever.RF.feature.importance.plot, shap.viz.fever.RF.svimportance.plot, fever.actinobacteriota, ncol=3, nrow=1, labels=LETTERS[1:3], rel_widths = c(2,2,0.8))
-ggsave("fever.RF.model.featureimport.SHAP.actinobacteriota.jpeg", plot=last_plot(), width=16, height=5, units=c("in"), dpi=600)
+shap.viz.fever.RF.svimportance.plot <- shap.viz.fever.RF.svimportance+
+    theme_bw()+
+    scale_y_discrete(labels=c("household size\n(<= 3 or > 3)","infant fever in visit 2", "Clostridium sensu stricto 1,\nspecies: human gut", "Bacilli","Bacteroides fragilis","Negativicutes", "Actinobacteriota"))+
+    ylab("feature")
+
+fever.actinobacteriota <- ggplot(aes(x=infant.fever.in.visit3.or.visit4, color=as.factor(infant.fever.in.visit3.or.visit4), y=Abundance),data=melted.alltaxa[melted.alltaxa$taxon==" p__Actinobacteriota",])+
+    geom_boxplot()+
+    theme_bw()+
+    scale_x_discrete(labels=c("no\nn=46", "yes\nn=63"))+
+    scale_color_manual(values=c("black", "#00BA38"))+
+    theme(legend.position = "none")+
+    xlab("fever in visits 3 or 4")+
+    ylab("Actinobacteriota relative abundance (%)")
+
+first.col.fever <- plot_grid(fever.RF.feature.importance.plot, shap.viz.fever.RF.svimportance.plot, fever.actinobacteriota, ncol=1, nrow=2, labels=LETTERS[1:2])
+second.col.fever <- plot_grid(fever.actinobacteriota, ncol=1, nrow=1, labels=LETTERS[3])
+first.second.col.fever <- plot_grid(first.col.fever, second.col.fever, ncol=2, nrow=1, rel_widths = c(2,0.8))
+first.second.col.fever
+ggsave("fever.RF.model.featureimport.SHAP.actinobacteriota.tiff", device="tiff", plot=last_plot(), width=12, height=8, units=c("in"), dpi=600)
 
 
 #Part 4: Among the taxa flagged as potentially associated with vomit in visit 3,4,
