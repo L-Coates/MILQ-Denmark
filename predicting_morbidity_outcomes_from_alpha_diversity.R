@@ -319,8 +319,29 @@ summary(dataset.visit2.model.vomit.shannon)
 
 
 #make a joint figure for alpha diversity metrics that associated with morbidity
-ggplot.faithPD.diarrhea <- ggplot(aes(x=as.factor(infant.diarrhea.in.visit3.or.visit4), y=faith.diversity, color=as.factor(infant.diarrhea.in.visit3.or.visit4)), data=dataset.visit2)+geom_boxplot()+xlab("diarrhea in\nvisits 3 or 4")+ylab("Faith's phylogenetic diversity")+scale_x_discrete(labels=c("no\nn=80", "yes\nn=29"))+scale_color_manual(values=c("black", "#F8766D"))+theme(legend.position="none", axis.title=element_text(size=9))
-ggplot.evenness.fever <- ggplot(aes(x=as.factor(infant.fever.in.visit3.or.visit4), y=pielou_evenness, color=as.factor(infant.fever.in.visit3.or.visit4)), data=dataset.visit2)+geom_boxplot()+xlab("fever in\nvisits 3 or 4")+ylab("Pielou's evenness")+scale_x_discrete(labels=c("no\nn=46", "yes\nn=63"))+scale_color_manual(values=c("black", "#00BA38"))+theme(legend.position = "none", axis.title=element_text(size=9))
-ggplot.shannon.fever <- ggplot(aes(x=as.factor(infant.fever.in.visit3.or.visit4), y=shannon_entropy, color=as.factor(infant.fever.in.visit3.or.visit4)), data=dataset.visit2)+geom_boxplot()+xlab("fever in\nvisits 3 or 4")+ylab("Shannon entropy")+scale_x_discrete(labels=c("no\nn=46", "yes\nn=63"))+scale_color_manual(values=c("black", "#00BA38"))+theme(legend.position = "none", axis.title=element_text(size=9))
+ggplot.faithPD.diarrhea <- ggplot(aes(x=as.factor(infant.diarrhea.in.visit3.or.visit4), y=faith.diversity, color=as.factor(infant.diarrhea.in.visit3.or.visit4)), data=dataset.visit2)+
+    geom_boxplot()+
+    theme_bw()+
+    xlab("diarrhea in\nvisits 3 or 4")+
+    ylab("Faith's phylogenetic diversity")+
+    scale_x_discrete(labels=c("no\nn=80", "yes\nn=29"))+
+    scale_color_manual(values=c("black", "#F8766D"))+
+    theme(legend.position="none", axis.title=element_text(size=9))
+ggplot.evenness.fever <- ggplot(aes(x=as.factor(infant.fever.in.visit3.or.visit4), y=pielou_evenness, color=as.factor(infant.fever.in.visit3.or.visit4)), data=dataset.visit2)+
+    geom_boxplot()+
+    theme_bw()+
+    xlab("fever in\nvisits 3 or 4")+
+    ylab("Pielou's evenness")+
+    scale_x_discrete(labels=c("no\nn=46", "yes\nn=63"))+
+    scale_color_manual(values=c("black", "#00BA38"))+
+    theme(legend.position = "none", axis.title=element_text(size=9))
+ggplot.shannon.fever <- ggplot(aes(x=as.factor(infant.fever.in.visit3.or.visit4), y=shannon_entropy, color=as.factor(infant.fever.in.visit3.or.visit4)), data=dataset.visit2)+
+    geom_boxplot()+
+    theme_bw()+
+    xlab("fever in\nvisits 3 or 4")+
+    ylab("Shannon entropy")+
+    scale_x_discrete(labels=c("no\nn=46", "yes\nn=63"))+
+    scale_color_manual(values=c("black", "#00BA38"))+
+    theme(legend.position = "none", axis.title=element_text(size=9))
 ggarrange(ggplot.faithPD.diarrhea, ggplot.evenness.fever, ggplot.shannon.fever, ncol=3, nrow=1, labels="AUTO")
-ggsave(plot=last_plot(), filename="morbidityVisits34.vs.alphaDiversityVisit2.jpeg", height = 8, width = 14, units="cm")
+ggsave(plot=last_plot(), filename="morbidityVisits34.vs.alphaDiversityVisit2.tiff", device="tiff", height = 9, width = 14, units="cm")
